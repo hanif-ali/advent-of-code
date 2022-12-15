@@ -21,6 +21,7 @@ Each directory contains the solutions for the day: `a.py` for Part A and `b.py` 
 | [Day 9](https://adventofcode.com/2022/day/8) | ⭐ | ⭐ |
 | [Day 10](https://adventofcode.com/2022/day/8) | ⭐ | ⭐ |
 | [Day 11](https://adventofcode.com/2022/day/8) | ⭐ | ⭐ |
+| [Day 12](https://adventofcode.com/2022/day/8) | ⭐ | ⭐ |
 
 
 
