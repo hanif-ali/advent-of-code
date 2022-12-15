@@ -1,3 +1,13 @@
+# Now, that the dividing by 3 clause is removed, `worry_level` grows really fast.and
+# To counter this we keep the worry_level capped using remainders.
+#
+# Since we only care about the divisibility of worry_level by the test_divisor for each monkey
+# we can get test_divisor_of_monkey_1 * test_divisor_of_monkey_2 * ... and keep the worry_level
+# capped by that number.
+#
+# This strategy is to preserve the divisibility information for each monkey's test_divisor
+
+
 from typing import List
 
 
@@ -39,14 +49,16 @@ class Monkey:
         monkey = Monkey(items, operation, test_divisor, true_target, false_target)
         cls.MONKEYS.append(monkey)
 
-    def inspect(self):
+    def inspect(self, max_worry: int):
         # Need it because self.items is mutated when calling inspect
         items_copy = self.items[:]
         for item in items_copy:
-            self.inspect_item(item)
+            self.inspect_item(item, max_worry)
 
-    def inspect_item(self, item: Item):
-        item.worry_level = eval(self.operation.replace("old", str(item.worry_level)))
+    def inspect_item(self, item: Item, max_worry: int):
+        item.worry_level = (
+            eval(self.operation.replace("old", str(item.worry_level))) % max_worry
+        )
 
         if (item.worry_level % self.test_divisor) == 0:
             self.throw_to(item, self.true_target)
@@ -59,10 +71,10 @@ class Monkey:
         self.items.remove(item)
 
     @classmethod
-    def run_rounds(cls, num_rounds: int) -> None:
+    def run_rounds(cls, num_rounds: int, max_worry: int) -> None:
         for i in range(num_rounds):
             for monkey in cls.MONKEYS:
-                monkey.inspect()
+                monkey.inspect(max_worry)
 
     def __repr__(self):
         return f"Monkey<{self.items}, inspected={self.items_inspected}>"
@@ -87,7 +99,7 @@ def parse_target_monkey_index(divisor_line: str) -> int:
     return int(divisor_line.split("throw to monkey")[1].strip())
 
 
-with open("testinput.txt") as fd:
+with open("input.txt") as fd:
     monkeys_data = [chunk.split("\n") for chunk in fd.read().split("\n\n")]
 
 for lines in monkeys_data:
@@ -105,14 +117,14 @@ for lines in monkeys_data:
         false_target=false_target_monkey_index,
     )
 
-Monkey.run_rounds(1)
+max_worry = 1
+for monkey in Monkey.MONKEYS:
+    max_worry *= monkey.test_divisor
+
+Monkey.run_rounds(10000, max_worry)
 print(Monkey.MONKEYS)
-Monkey.run_rounds(19)
-print(Monkey.MONKEYS)
-Monkey.run_rounds(980)
-print(Monkey.MONKEYS)
-# inspections = [monkey.items_inspected for monkey in Monkey.MONKEYS]
-# top = max(inspections)
-# inspections.remove(top)
-# second_top = max(inspections)
-# print("Monkey Business: ", top * second_top)
+inspections = [monkey.items_inspected for monkey in Monkey.MONKEYS]
+top = max(inspections)
+inspections.remove(top)
+second_top = max(inspections)
+print("Monkey Business: ", top * second_top)
